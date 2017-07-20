@@ -1,0 +1,49 @@
+Problem Statement - 1
+List of all employees who draw higher salary than the average salary of that department
+
+
+Table data:
+
+100,Deepak,10000,IT
+101,Rama,20000,HR
+102,Raja,30000,Non-IT
+103,Deepak,40000,Helpdesk
+104,Sita,50000,Finance
+105,Deepak,60000,IT
+106,Rama,22000,HR
+
+Creating a table:
+
+CREATE TABLE hive_adv(
+  `emp_id` int, 
+  `name` string, 
+  `salary` int,
+  `dept` string)
+ROW FORMAT DELIMITED 
+  FIELDS TERMINATED BY ',' 
+STORED AS INPUTFORMAT 
+  'org.apache.hadoop.mapred.TextInputFormat' 
+OUTPUTFORMAT 
+  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
+LOCATION
+  'hdfs://localhost:9000/user/hive/warehouse/hive_assignments.db/hive_adv'
+TBLPROPERTIES (
+  'COLUMN_STATS_ACCURATE'='true', 
+  'numFiles'='1', 
+  'totalSize'='152', 
+  'transient_lastDdlTime'='1500532916')
+
+
+load data:
+
+LOAD DATA LOCAL INPATH '/home/acadgild/Desktop/Hive/hive_adv.txt' into table hive_adv;                                   
+
+
+solution:
+
+Here first we need to calculate average salary of each department and then need to list out employees who draw higher salary than the average salary.
+	In this we can use subqueries.
+Inner query to find average and outer to list employees.
+ 
+
+select h.* from (select h.*, avg(salary) over(partition by dept) as avg_salary from hive_adv h) h where h.salary > h.avg_salary;
